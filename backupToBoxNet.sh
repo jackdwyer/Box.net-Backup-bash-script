@@ -17,8 +17,10 @@ fi
 #SOME GLOBAL VARIABLES - THESE NEED TO BE SETUP
 #-------------------
 #This is path to the log rsynclog file
-rs="/home/jack/logs/etc/rSyncLog" 	# This file neeeds to be created before script will run 
-					# eg: nano /path/to/log/rSyncLog, then close and save
+rs="/home/jack/logs/rSyncLog.log"
+
+#Creates the log file, for rsync to dump its shit in.
+touch $rs
 
 #SOURCE = the acutal location of backup directory
 #DESTINATION = save location for the corresponding source
