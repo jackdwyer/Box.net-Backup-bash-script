@@ -1,0 +1,16 @@
+-----------------------------
+Jack Dwyer
+06 October 2011
+
+Bash Backup Script utilsing the free 50gb offer of box.net
+
+Features:
+-Email's you if the backup failed
+
+TODO:
+-Backup db on localhost
+
+
+Need to create the array of backup location, and the destination location (the webdav mounted drive)
+
+And set up the rsynclog variable of where the log will be stored
