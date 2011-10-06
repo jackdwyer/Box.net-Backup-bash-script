@@ -31,11 +31,15 @@ if [ ${#source[@]} != ${#destination[@]} ]; then
 	exit 1
 fi
 
+#mysql setup values
+password=a
+user=root
+sqlDump="/home/jack/Desktop/mysqlDump.sql"
 
-
-
-#total length for the loop
+#total length for the looping
 backupLen=${#source[@]}
+
+errors=0
 
 #-------------------
 #Setup Up EMAIL MESSAGE - ONLY SENT IF THERE IS AN ERROR
@@ -47,6 +51,10 @@ echo "--------------------------------------------------------------------------
 echo "" >> $rs
 
 
+#dump mysql databases
+mysqldump -u ${user} -p${password} --all-databases > ${sqlDump}
+
+
 #Generate a rsync commands
 for (( i=0; i<=$(( $backupLen - 1)); i++ ))
 do
@@ -54,7 +62,6 @@ do
 done
 
 
-errors=0
 #--------------------
 #Actually do the backups
 for (( i=0; i<=$(( $backupLen - 1)); i++ ))
@@ -65,6 +72,7 @@ do
 	fi
 
 done
+
 
 #Shoot off email to me, if the shit fucks up\
 if [ $errors -gt 0 ]; then
