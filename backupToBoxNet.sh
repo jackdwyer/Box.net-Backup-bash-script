@@ -4,6 +4,7 @@
 #------------------- 
 # Backup Script
 # Uses a webdav mounted box.net directory
+# Can use any mounted path though, just comment out the first check
 # and rsync to backup specified files
 #-------------------
 
@@ -13,16 +14,17 @@ if [ $? -eq 1 ]; then
 	mount ~/box.net
 fi
 
-#SOME GLOBAL VARIABLES
+#SOME GLOBAL VARIABLES - THESE NEED TO BE SETUP
 #-------------------
 #This is path to the log rsynclog file
-rs="/home/jack/Desktop/rSyncLog"
+rs="/home/jack/logs/etc/rSyncLog" 	# This file neeeds to be created before script will run 
+					# eg: nano /path/to/log/rSyncLog, then close and save
 
 #SOURCE = the acutal location of backup directory
 #DESTINATION = save location for the corresponding source
 #source must match its destination
-source=("/home/jack/Desktop/src")
-destination=("/home/jack/Desktop/testDir")
+source=("/home/jack/my/shit/1" "/all/the/shit/2/")
+destination=("/home/jack/box.net/myshitBACKUP1" "/home/jack/boxnet/ALLTHESHIT_BACKUP2")
 
 #Validate both source and destination array are matching length
 if [ ${#source[@]} != ${#destination[@]} ]; then
@@ -34,8 +36,8 @@ fi
 #mysql setup values
 password=a
 user=root
-mysqlSource=("/home/jack/Desktop/WORKING.sql")
-mysqlDestination=("/home/jack/Desktop/testDir")
+mysqlSource=("/home/jack/Desktop/WORKING.sql") #this is actually where the dump will be stored, good variable name
+mysqlDestination=("/home/jack/box.net/mysqlbackup")
 
 #Validate sqlSource and sqlDestination are matching length
 if [ ${#sqlSource[@]} != ${#sqlDestination[@]} ]; then
@@ -50,11 +52,13 @@ mysqlLen=${#mysqlSource[@]}
 
 errors=0
 
+#TODO check log files exist, if not create them.  As script will fail if they are not floating around
+
 #-------------------
 #Setup Up EMAIL MESSAGE - ONLY SENT IF THERE IS AN ERROR
-echo "To: jackjack.dwyer@gmail.com" > $rs 
-echo "From: jack@servesbeer.com" >> $rs 
-echo "Subject: BACKUP ERROR OF VPS" >> $rs 
+echo "To: YOUR_EMAIL@gmail.com" > $rs 
+echo "From: server@yours.com" >> $rs 
+echo "Subject: BACKUP ERROR" >> $rs 
 echo "" >> $rs 
 echo "--------------------------------------------------------------------------------------------------------------------" >> $rs
 echo "" >> $rs
@@ -63,7 +67,6 @@ echo "" >> $rs
 for (( i=0; i<=$(( $dirLen - 1)); i++ ))
 do
 	rSyncArray[$i]="rsync -a --log-file=${rs} ${source[$i]}  ${destination[$i]}"
-	#echo "${rSyncArray[$i]}"
 done
 
 #Generate mysqldump and rsnyc commands only if required
@@ -71,7 +74,7 @@ if [ $mysqlLen != 0 ]; then
 	#Generate mysqldump commands, from the array of databases needed to be backed up
 	for (( i=0; i<=$(( $mysqlLen - 1)); i++ ))
 	do
-		#Sort of point less loop  as its just doing a total dump, but could change so its specifed databases
+		#Sort of point less loop  as its just doing a total dump, but could change so it specifed databases
 		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases"
 	done
 
@@ -103,12 +106,7 @@ do
 
 done
 
-
 #Shoot off email to me, if the shit fucks up
 if [ $errors -gt 0 ]; then
 	msmtp -t < ${rs}
 fi
-
-
-
-#TO DO DUMP DB to backup, and organse the actual backup locations and chosen directories.
