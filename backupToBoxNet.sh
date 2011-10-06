@@ -24,7 +24,15 @@ rs="/home/jack/Desktop/rSyncLog"
 source=("/home/jack/Desktop/src")
 destination=("/home/jack/Desktop/testDir")
 
-#TODO check that  both source, and destination are same length
+#Check both source and destination array are matching length
+if [ ${#source[@]} != ${#destination[@]} ]; then
+	#TODO EMAIL error the backup can not be ran.
+	echo "SOURCE AND DESTINATION ARRAYS DO NOT MATCH, backup can not be ran"
+	exit 1
+fi
+
+
+
 
 #total length for the loop
 backupLen=${#source[@]}
