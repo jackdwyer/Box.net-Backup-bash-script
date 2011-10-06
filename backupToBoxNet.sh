@@ -34,8 +34,8 @@ fi
 #mysql setup values
 password=a
 user=root
-sqlSource=("/home/jack/Desktop/mysqlDumpTEST.sql")
-sqlDestination=("/home/jack/Desktop/dbDump")
+mysqlSource=("/home/jack/Desktop/WORKING.sql")
+mysqlDestination=("/home/jack/Desktop/dbDump")
 
 #Validate sqlSource and sqlDestination are matching length
 if [ ${#sqlSource[@]} != ${#sqlDestination[@]} ]; then
@@ -46,7 +46,7 @@ fi
 
 #Length of each array (sql, directories)
 backupLen=${#source[@]}
-mysqlLen=${#sqlSource[@]}
+mysqlLen=${#mysqlSource[@]}
 
 errors=0
 
@@ -71,8 +71,8 @@ if [ $mysqlLen != 0 ]; then
 	for (( i=0; i<=$(( $mysqlLen - 1)); i++ ))
 	do
 		#EXAMPLE COMPLETE DATABASE: $ mysqldump -u 'root' -p'a' --all -databases > PATH/TO/DUMP.sql
-		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases > ${sqlSource[$i]}" 
-		echo ${mysqlDump[$i]}
+		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases" 
+		#echo ${mysqlDump[$i]}
 	done
 
 	#run mysql dump commands, so dumps have been created
@@ -80,8 +80,8 @@ if [ $mysqlLen != 0 ]; then
 	for (( i=0; i<=$(( $dumpLen - 1)); i++ ))
         do
         	echo "TRYING TO RUN mysqlDUMP commands" 
-		${mysqlDump[$i]}
-        	echo ${mysqlDump[$i]}
+		${mysqlDump[$i]} > ${mysqlSource[$i]}
+        	#echo ${mysqlDump[$i]}
 	done
 
 
