@@ -1,16 +1,39 @@
 -----------------------------
+Backup To Box.net
+----------------------------
 Jack Dwyer
 06 October 2011
 
 Bash Backup Script utilsing the free 50gb offer of box.net
+Can use any mounted directory, is not tied directly to box.net.
 
 Features:
 -Email's you if the backup failed
+-Backs up Mysql DB if required
+-Backs up all specifed directories
 
-TODO:
--Backup db on localhost
+Software needed:
+- msmtp
+I have mine configured similar to how is shown in this post:
+http://ubuntuforums.org/showthread.php?t=1472520
+
+- davfs2 to mount box.net if chosing to use that as your backup location.
+I setup my box.net following these steps:
+http://ubuntuforums.org/showpost.php?p=11258734&postcount=34
+
+---------------------------------------------------------------------
+How to use:
+---------------------------------------------------------------------
+All you should need to do, is:
+1st - 	Fill in the source, and destination Array with all the directories
+	you want backed up.
+	Source[i] needs to make with its specified Destintion[i]\
+
+2nd - 	Same deal with database's if you you it backed up. Also need to give
+	mysql database username, and password.
+
+3rd -	Set the email to yours, or else when it fails you wont get an email!
+
+Pretty sure that sums it up.
 
 
-Need to create the array of backup location, and the destination location (the webdav mounted drive)
-
-And set up the rsynclog variable of where the log will be stored
