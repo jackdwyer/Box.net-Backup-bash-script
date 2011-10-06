@@ -13,7 +13,7 @@ Features:
 -Backs up all specifed directories
 
 Software needed:
-- msmtp
+- msmtp for emailing to gmail account
 I have mine configured similar to how is shown in this post:
 http://ubuntuforums.org/showthread.php?t=1472520
 
@@ -29,12 +29,14 @@ All you should need to do, is:
 
 2nd - 	Fill in the source, and destination Array with all the directories
 	you want backed up.
-	Source[i] needs to make with its specified Destintion[i]\
+	Source[i] needs to make with its specified Destintion[i]
 
 3rd - 	Same deal with database's if you you it backed up. Also need to give
 	mysql database username, and password.
 
 4th -	Set the email to yours, or else when it fails you wont get an email!
+
+5th -	Cronjob the baby
 
 Pretty sure that sums it up.
 
