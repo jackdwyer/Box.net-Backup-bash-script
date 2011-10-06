@@ -1,6 +1,6 @@
 #!/bin/sh
 # JACK DWYER
-# 05 October 2011
+# 06 October 2011
 #------------------- 
 # Backup Script
 # Uses a webdav mounted box.net directory
@@ -35,7 +35,7 @@ fi
 password=a
 user=root
 mysqlSource=("/home/jack/Desktop/WORKING.sql")
-mysqlDestination=("/home/jack/Desktop/dbDump")
+mysqlDestination=("/home/jack/Desktop/testDir")
 
 #Validate sqlSource and sqlDestination are matching length
 if [ ${#sqlSource[@]} != ${#sqlDestination[@]} ]; then
@@ -45,7 +45,7 @@ if [ ${#sqlSource[@]} != ${#sqlDestination[@]} ]; then
 fi
 
 #Length of each array (sql, directories)
-backupLen=${#source[@]}
+dirLen=${#source[@]}
 mysqlLen=${#mysqlSource[@]}
 
 errors=0
@@ -60,9 +60,10 @@ echo "--------------------------------------------------------------------------
 echo "" >> $rs
 
 #Generate a rsync commands
-for (( i=0; i<=$(( $backupLen - 1)); i++ ))
+for (( i=0; i<=$(( $dirLen - 1)); i++ ))
 do
 	rSyncArray[$i]="rsync -a --log-file=${rs} ${source[$i]}  ${destination[$i]}"
+	#echo "${rSyncArray[$i]}"
 done
 
 #Generate mysqldump and rsnyc commands only if required
@@ -70,32 +71,30 @@ if [ $mysqlLen != 0 ]; then
 	#Generate mysqldump commands, from the array of databases needed to be backed up
 	for (( i=0; i<=$(( $mysqlLen - 1)); i++ ))
 	do
-		#EXAMPLE COMPLETE DATABASE: $ mysqldump -u 'root' -p'a' --all -databases > PATH/TO/DUMP.sql
-		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases" 
-		#echo ${mysqlDump[$i]}
+		#Sort of point less loop  as its just doing a total dump, but could change so its specifed databases
+		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases"
 	done
 
-	#run mysql dump commands, so dumps have been created
+	#run mysqldump with the specified matching location to save dump (mysqlSource)
 	dumpLen=${#mysqlDump[@]}
 	for (( i=0; i<=$(( $dumpLen - 1)); i++ ))
         do
-        	echo "TRYING TO RUN mysqlDUMP commands" 
 		${mysqlDump[$i]} > ${mysqlSource[$i]}
-        	#echo ${mysqlDump[$i]}
 	done
 
-
-	#append the new rsync commands to directory rsnyc array
-	#for (( i=0; i<=$(( $mysqlLen -1)); i++ ))
-	#do
-		#append the commands
-	#done
+	#Creates new rsync commands, and adds them to the previous rsync command array
+	for (( i=0; i<=$(( $dumpLen -1)); i++ ))
+	do
+		dumprSync="rsync -a --log-file=${rs} ${mysqlSource[$i]} ${mysqlDestination[$i]}"
+		rSyncArray=("${rSyncArray[@]}" "${dumprSync}")
+	done
 fi
 
 
-#--------------------
+
 #Actually do the backups - EG: run the rsync commands
-for (( i=0; i<=$(( $backupLen - 1)); i++ ))
+rSyncArrayLen=${#rSyncArray[@]}
+for (( i=0; i<=$(( $rSyncArrayLen - 1)); i++ ))
 do
 	${rSyncArray[$i]}
 	if [ $? -gt 0 ]; then
