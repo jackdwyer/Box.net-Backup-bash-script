@@ -34,7 +34,7 @@ fi
 #mysql setup values
 password=a
 user=root
-sqlSource=("/home/jack/Desktop/mysqlDump.sql")
+sqlSource=("/home/jack/Desktop/mysqlDumpTEST.sql")
 sqlDestination=("/home/jack/Desktop/dbDump")
 
 #Validate sqlSource and sqlDestination are matching length
@@ -59,33 +59,42 @@ echo "" >> $rs
 echo "--------------------------------------------------------------------------------------------------------------------" >> $rs
 echo "" >> $rs
 
-
-#dump mysql databases
-mysqldump -u ${user} -p${password} --all-databases > ${sqlDump}
-
-
 #Generate a rsync commands
 for (( i=0; i<=$(( $backupLen - 1)); i++ ))
 do
 	rSyncArray[$i]="rsync -a --log-file=${rs} ${source[$i]}  ${destination[$i]}"
 done
 
+#Generate mysqldump and rsnyc commands only if required
 if [ $mysqlLen != 0 ]; then
-	#First Generate SQL Dump file
+	#Generate mysqldump commands, from the array of databases needed to be backed up
 	for (( i=0; i<=$(( $mysqlLen - 1)); i++ ))
 	do
-		#Build array for mysql dump files and location on box.net to store
+		#EXAMPLE COMPLETE DATABASE: $ mysqldump -u 'root' -p'a' --all -databases > PATH/TO/DUMP.sql
+		mysqlDump[$i]="mysqldump -u ${user} -p${password} --all-databases > ${sqlSource[$i]}" 
+		echo ${mysqlDump[$i]}
 	done
+
+	#run mysql dump commands, so dumps have been created
+	dumpLen=${#mysqlDump[@]}
+	for (( i=0; i<=$(( $dumpLen - 1)); i++ ))
+        do
+        	echo "TRYING TO RUN mysqlDUMP commands" 
+		${mysqlDump[$i]}
+        	echo ${mysqlDump[$i]}
+	done
+
 
 	#append the new rsync commands to directory rsnyc array
-	for (( i=0; i<=$(( $mysqlLen -1)); i++ ))
-	do
+	#for (( i=0; i<=$(( $mysqlLen -1)); i++ ))
+	#do
 		#append the commands
-	done
+	#done
 fi
 
+
 #--------------------
-#Actually do the backups
+#Actually do the backups - EG: run the rsync commands
 for (( i=0; i<=$(( $backupLen - 1)); i++ ))
 do
 	${rSyncArray[$i]}
