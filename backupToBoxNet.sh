@@ -21,8 +21,8 @@ rs="/home/jack/Desktop/rSyncLog"
 #SOURCE = the acutal location of backup directory
 #DESTINATION = save location for the corresponding source
 #source must match its destination
-source=("/home/jack/Desktop/src" "fucked")
-destination=("/home/jack/Desktop/testDir" "error")
+source=("/home/jack/Desktop/src")
+destination=("/home/jack/Desktop/testDir")
 
 #TODO check that  both source, and destination are same length
 
@@ -30,10 +30,10 @@ destination=("/home/jack/Desktop/testDir" "error")
 backupLen=${#source[@]}
 
 #-------------------
-#Setup Up EMAIL MESSAGE
+#Setup Up EMAIL MESSAGE - ONLY SENT IF THERE IS AN ERROR
 echo "To: jackjack.dwyer@gmail.com" > $rs 
 echo "From: jack@servesbeer.com" >> $rs 
-echo "Subject: Backup Status" >> $rs 
+echo "Subject: BACKUP ERROR OF VPS" >> $rs 
 echo "" >> $rs 
 echo "--------------------------------------------------------------------------------------------------------------------" >> $rs
 echo "" >> $rs
@@ -45,17 +45,23 @@ do
 	rSyncArray[$i]="rsync -a --log-file=${rs} ${source[$i]}  ${destination[$i]}"
 done
 
+
+errors=0
 #--------------------
 #Actually do the backups
 for (( i=0; i<=$(( $backupLen - 1)); i++ ))
 do
 	${rSyncArray[$i]}
-	#if [     			-check for errors 
-	#echo "$?"
+	if [ $? -gt 0 ]; then
+        	errors=1
+	fi
+
 done
 
-#Shoot off email to me, telling me about the shit
-msmtp -t < ${rs}
+#Shoot off email to me, if the shit fucks up\
+if [ $errors -gt 0 ]; then
+	msmtp -t < ${rs}
+fi
 
 
 
