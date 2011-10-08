@@ -1,3 +1,10 @@
+***************
+NOTE
+rsync doesnt just send the delta files
+Need to do more research to set up a better back up solution using box.net
+
+*************
+
 -----------------------------
 Backup To Box.net
 ----------------------------
