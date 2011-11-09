@@ -1,3 +1,11 @@
+*****
+New box.net backup script is going to be written tomorrow/on the weekend
+It will just use cp, to copy over any files that are not currently in the 
+box.net directory.
+
+Aswell as do the db dump.  new project will be created
+*****
+
 ***************
 NOTE
 rsync doesnt just send the delta files
